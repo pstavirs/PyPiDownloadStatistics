@@ -34,7 +34,7 @@ try:
         last_v = last_data.get(k, '0')
         diff_data[k] = int(v) - int(last_v)
     print diff_data
-except scraperwiki.sqlite.SqliteError, e:
+except Exception as e:
     print str(e) 
 
 #
