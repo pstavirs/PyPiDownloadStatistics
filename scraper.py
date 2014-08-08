@@ -24,7 +24,7 @@ print data
 #
 diff_data = {}
 try:
-    last_data_list = scraperwiki.sqlite.select("* from swdata where Date=(select max(Date) from swdata where Date < '" + date.today().isoformat() + "')")
+    last_data_list = scraperwiki.sqlite.select("* from data where Date=(select max(Date) from swdata where Date < '" + date.today().isoformat() + "')")
     last_data = last_data_list[0]
     print last_data
     diff_data['Date'] = date.today()
