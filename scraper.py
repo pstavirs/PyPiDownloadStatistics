@@ -1,21 +1,68 @@
+import cStringIO
+import re
 import scraperwiki 
-import requests
-import lxml.html
+import string 
+import sys 
+import vanity 
 from datetime import datetime, date, timedelta
 
-gc_project = 'ostinato'
+pypi_pkg = 'python-ostinato'
+
+# bootstrap code - start
+#releases = [ 
+    {file: 'python-ostinato-0.6b1.tar.gz', date: '2014-07-08'},
+    {file: 'python-ostinato-0.6.tar.gz', date: '2014-07-08'},
+    {file: 'python-ostinato-0.7.tgz', date: '2015-06-09'},
+    {file: 'python-ostinato-0.7.1.tar.gz', date: '2015-06-16'}
+]
+
+for r in releases:
+    print r[file], r[date]
+    scraperwiki.sqlite.save(unique_keys=['Date'], 
+            data={'Date': r[date], string.replace(r[file], '.', '_'): 0}, 
+            table_name='data')
+# bootstrap code - ends
 
 #
-# scrape and get today's cumulative download count
+# use vanity to get cumulative download count for each version
 #
-r = requests.get('http://code.google.com/p/' + gc_project + '/downloads/list?can=1&sort=uploaded&colspec=Filename+DownloadCount') 
-doc = lxml.html.document_fromstring(r.text)
-downloads = doc.xpath("//tr[@class='ifOpened']")
+
+# temporarily redirect stdout and argv before calling vanity
+stream = cStringIO.StringIO()
+stdout_ = sys.stdout
+sys.stdout = stream
+argv_ = sys.argv
+sys.argv = ['vanity', pypi_pkg]
+
+count = 1
+while count <= 3:
+    try:
+        sys.stderr.write('vanity try %d ...\n' % (count))
+        vanity.vanity()
+        break
+    except Exception as e:
+        sys.stderr.write(e)
+        count = count + 1
+        continue
+
+# restore stdout and stdout
+sys.argv = argv_
+sys.stdout = stdout_
+
+doc = stream.getvalue()
+downloads = re.split('\n', doc)
+#print downloads
+
 data = {'Date':date.today(), 'Timestamp':datetime.utcnow()}
 for d in downloads:
-    #print(lxml.html.tostring(d, pretty_print=True))
-    filename = d[1].text_content().strip().replace('.', '_')
-    count = d[2].text_content().strip()
+    d = string.strip(d)
+    m = re.match(r'python-ostinato-', d)
+    if m == None:
+        continue
+    dl = re.split(r'[ \t]+', d)
+    #print dl
+    filename = string.replace(dl[0], '.', '_')
+    count = dl[2]
     data[filename] = count
 print data
 
@@ -32,6 +79,8 @@ try:
         if (k == 'Date' or k == 'Timestamp'):
             continue;
         last_v = last_data.get(k, '0')
+        if last_v == None:
+            last_v = 0
         diff_data[k] = int(v) - int(last_v)
     print diff_data
 except Exception as e:
