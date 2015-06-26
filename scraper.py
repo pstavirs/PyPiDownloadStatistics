@@ -9,7 +9,7 @@ from datetime import datetime, date, timedelta
 pypi_pkg = 'python-ostinato'
 
 # bootstrap code - start
-#releases = [ 
+releases = [ 
     {file: 'python-ostinato-0.6b1.tar.gz', date: '2014-07-08'},
     {file: 'python-ostinato-0.6.tar.gz', date: '2014-07-08'},
     {file: 'python-ostinato-0.7.tgz', date: '2015-06-09'},
