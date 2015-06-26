@@ -9,18 +9,18 @@ from datetime import datetime, date, timedelta
 pypi_pkg = 'python-ostinato'
 
 # bootstrap code - start
-releases = [ 
-    {file: 'python-ostinato-0.6b1.tar.gz', date: '2014-07-08'},
-    {file: 'python-ostinato-0.6.tar.gz', date: '2014-07-08'},
-    {file: 'python-ostinato-0.7.tgz', date: '2015-06-09'},
-    {file: 'python-ostinato-0.7.1.tar.gz', date: '2015-06-16'}
-]
-
-for r in releases:
-    print r[file], r[date]
-    scraperwiki.sqlite.save(unique_keys=['Date'], 
-            data={'Date': r[date], string.replace(r[file], '.', '_'): 0}, 
-            table_name='data')
+#releases = [ 
+#    {file: 'python-ostinato-0.6b1.tar.gz', date: '2014-07-08'},
+#    {file: 'python-ostinato-0.6.tar.gz', date: '2014-07-08'},
+#    {file: 'python-ostinato-0.7.tgz', date: '2015-06-09'},
+#    {file: 'python-ostinato-0.7.1.tar.gz', date: '2015-06-16'}
+#]
+#
+#for r in releases:
+#    print r[file], r[date]
+#    scraperwiki.sqlite.save(unique_keys=['Date'], 
+#            data={'Date': r[date], string.replace(r[file], '.', '_'): 0}, 
+#            table_name='data')
 # bootstrap code - ends
 
 #
@@ -35,13 +35,13 @@ argv_ = sys.argv
 sys.argv = ['vanity', pypi_pkg]
 
 count = 1
-while count <= 3:
+while count <= 5:
     try:
         sys.stderr.write('vanity try %d ...\n' % (count))
         vanity.vanity()
         break
     except Exception as e:
-        sys.stderr.write(e)
+        sys.stderr.write(str(e)+'\n')
         count = count + 1
         continue
 
